@@ -1,0 +1,7 @@
+/target
+
+# Internal / dev-only (not published)
+/.claude/
+/CLAUDE.md
+/tasks/
+/requirements.md

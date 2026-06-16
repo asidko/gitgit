@@ -1,0 +1,25 @@
+# QA environment: a real virtual X screen running the actual gitgit TUI in xterm,
+# driven by xdotool (real mouse + keyboard) and screenshotted with ImageMagick.
+# Ubuntu 24.04 ships glibc 2.39, matching the binary's requirement (<= 2.39).
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive DISPLAY=:99 LANG=C.UTF-8 LC_ALL=C.UTF-8
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        xvfb xterm xdotool x11-utils imagemagick \
+        xfonts-base fonts-dejavu-core \
+        git procps ca-certificates \
+        libxtst6 libxrender1 libxext6 libxi6 libxrandr2 libxxf86vm1 libfreetype6 fontconfig libgtk-3-0 \
+    && rm -rf /var/lib/apt/lists/* \
+    # Allow ImageMagick to read/write the formats we use (default policy is fine for
+    # PNG; this guards against a restrictive policy blocking screen capture). Touch
+    # whichever policy path exists so a base bump from ImageMagick 6 to 7 still works.
+    && for p in /etc/ImageMagick-6/policy.xml /etc/ImageMagick-7/policy.xml; do \
+         [ -f "$p" ] && sed -i 's/.*<policy domain="coder".*PNG.*//' "$p"; \
+       done; true
+
+COPY scripts/qa.sh /qa/qa.sh
+COPY scripts/entrypoint.sh /qa/entrypoint.sh
+RUN chmod +x /qa/qa.sh /qa/entrypoint.sh
+
+WORKDIR /qa
+ENTRYPOINT ["/qa/entrypoint.sh"]

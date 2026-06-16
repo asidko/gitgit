@@ -1,0 +1,49 @@
+[package]
+name = "gitgit"
+version = "0.1.0"
+edition = "2021"
+description = "Full-fledged git in your terminal - the JetBrains Git client, in a TUI"
+repository = "https://github.com/asidko/gitgit"
+license = "MIT"
+readme = "README.md"
+
+[lib]
+name = "gitgit"
+path = "src/lib.rs"
+
+[[bin]]
+name = "gitgit"
+path = "src/main.rs"
+
+[dev-dependencies]
+# Test-only: the golden render test hashes the snapshot JSON to ratchet
+# byte-identity of the default frame. Never linked into the binary.
+sha2 = "0.10"
+
+[dependencies]
+ratatui = "0.29"
+crossterm = "0.28"
+# default-fancy uses pure-Rust fancy-regex (no oniguruma C dependency).
+syntect = { version = "5.3", default-features = false, features = ["default-fancy"] }
+# Search ".*" regex toggle. Already in the lock transitively via syntect, so this
+# adds no new compile - it only promotes it to a direct dependency we can call.
+fancy-regex = "0.16"
+# Real git backend (src/backend/git.rs). default-features off drops the https/ssh
+# transports -> no OpenSSL/libssh2/bindgen; we only read a local on-disk repo. The
+# vendored libgit2 is built with the build-time `cc`. git2 types never escape
+# src/backend/.
+git2 = { version = "0.21", default-features = false }
+# Boot-time TOML config (src/config.rs): derive deserializes the layout/behavior
+# params. toml default-features off drops the serializer/datetime-display we never
+# use; we only PARSE a small struct. Config IO is boot-only, never in apply/ui.
+serde = { version = "1.0.228", features = ["derive"] }
+toml = { version = "1.1.2", default-features = false, features = ["parse", "serde"] }
+# Display-width-aware truncate/pad of log columns (src/ui/widgets.rs): a CJK char
+# or emoji is 1 char but 2 terminal columns, so char-count budgeting shoves the
+# right-aligned author/hash/date columns off-grid. Already in the lock transitively
+# via ratatui 0.29, so promoting it to a direct dependency adds no new compile.
+unicode-width = "0.2"
+two-face = { version = "0.5.1", default-features = false, features = ["syntect-fancy"] }
+
+[profile.dev]
+opt-level = 1

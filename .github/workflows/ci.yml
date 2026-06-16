@@ -1,0 +1,32 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      # The git-backend tests create real commits (cherry-pick / revert / reword /
+      # rebase via git2's repo.signature()), which reads user.name/user.email - the
+      # runner has none, so provide one as any commit requires.
+      - name: Configure git identity
+        run: |
+          git config --global user.name "gitgit ci"
+          git config --global user.email "ci@gitgit.local"
+
+      - name: Clippy
+        run: cargo clippy --all-targets --locked -- -D warnings
+
+      - name: Test
+        run: cargo test --locked

@@ -1,0 +1,44 @@
+# gitgit configuration - copy to ./gitgit.toml (project-local, wins) or to
+# $XDG_CONFIG_HOME/gitgit/config.toml (falls back to ~/.config/gitgit/config.toml).
+#
+# Every key is OPTIONAL: a missing file, a missing section, or a missing field
+# uses the default shown below, which reproduces gitgit's built-in behavior
+# exactly. A malformed file is non-fatal - gitgit warns in the status line and
+# falls back to these defaults. Values out of range are clamped, not rejected.
+# Read ONCE at startup; editing this file requires a restart.
+#
+# Drag-resizing the log columns or pane splits at runtime is REMEMBERED across runs in
+# `state.toml` beside this file (auto-written on quit, overlaid over these defaults at
+# start). Delete `state.toml` to reset to the values here.
+
+[repo]
+# Repository to open. Unset (the default) opens the current working directory.
+# path = "/path/to/repo"
+
+[layout]
+# Pane separator positions as fractions of their parent span. Clamped to 0.15..0.85.
+split_diff_v = 0.50   # diff-region height vs the log body
+split_log_h = 0.62    # commit-log width vs the right column
+split_right_v = 0.58  # files-tree height vs the commit detail
+split_diff_h = 0.50   # diff old-pane width vs new-pane width
+
+[columns]
+# Log right-hand column widths, in terminal columns. Clamped to 6..40.
+author = 18
+hash = 9
+date = 18
+
+[view]
+# Initial viewer toggles.
+diff_mode = "side"        # "side" (side-by-side) or "unified"
+word_wrap = false         # wrap long code lines instead of clipping
+show_whitespace = false   # render whitespace markers in the viewer
+show_diff = true          # show the top diff/preview viewer
+autosave = true           # autosave the editable buffer on navigate-away / Esc
+flat = false              # files pane as a flat no-folder list vs the nested tree
+
+[behavior]
+mouse = true              # enable mouse capture (drag-resize / wheel / click)
+commit_cap = 300          # max commits walked per load (pagination is later)
+preview_line_cap = 5000   # max lines emitted for one diff/source preview
+date_format = "dmy"       # "dmy" -> "DD.MM.YYYY, HH:MM" ; "iso" -> "YYYY-MM-DD HH:MM"
